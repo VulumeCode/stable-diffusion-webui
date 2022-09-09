@@ -42,6 +42,19 @@ from retry import retry
 # install it with 'pip install python-slugify'
 from slugify import slugify
 
+# add global options to models
+def patch_conv(**patch):
+	cls = torch.nn.Conv2d
+	init = cls.__init__
+	def __init__(self, *args, **kwargs):
+		kwargs = {**kwargs, **patch}
+		return init(self, *args, **kwargs)
+	cls.__init__ = __init__
+
+if True:
+	patch_conv(padding_mode='circular')
+	print("patched for tiling")
+
 try:
 	# this silences the annoying "Some weights of the model checkpoint were not used when initializing..." message at start.
 	from transformers import logging
